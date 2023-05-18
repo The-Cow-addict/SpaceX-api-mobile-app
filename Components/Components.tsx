@@ -1,11 +1,13 @@
 import { useQuery, DocumentNode , gql} from '@apollo/client';
 import { Text, View, StyleSheet, Pressable, Modal, FlatList , Image, ImageBackground, SafeAreaView, ScrollView, Linking, TouchableOpacity, TextInput} from 'react-native';
-import {useState} from 'react'
-import { StatusBar } from 'expo-status-bar';
-import {Data} from './data'
+import {useState, useEffect} from 'react'
+import {Data} from './data';
+import  AsyncStorage  from '@react-native-async-storage/async-storage';
+
+
 
 type ComponentProps = {
-  dataQuery : DocumentNode
+  dataQuery : DocumentNode,
 }
 
 const Components : React.FC<ComponentProps> = ({dataQuery}) => {
@@ -13,6 +15,7 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
   const [selectedRocket, setselectedRocket] = useState<any>(null)
   const [showModal, setshowModal] = useState(false)
   const [searchQuery, setSearchQuery] = useState('');
+  
 
   const handlePress = (rocket : any) => {
     setselectedRocket(rocket)
@@ -24,14 +27,13 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
       rocket.name.toLowerCase().includes(searchQuery.toLowerCase())
     )
   : data?.rockets;
-  
 
   const handleWikipediaPress = () => {
     Linking.openURL(selectedRocket.wikipedia);
   };
 
   if (loading) {
-    return <Text>Loading...</Text>
+    return <Text style={{fontWeight : 'bold', color : 'white'}}>Loading...</Text>
   }
 
   if (error) {
@@ -65,18 +67,15 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
         value={searchQuery}
         onChangeText={text => setSearchQuery(text)}
       />
-      {data && data.rockets ? (
-          <FlatList 
-            data={filteredRockets}
-            renderItem={({ item }) => renderItem({ item })}
-            keyExtractor={(item) => item.name}
-            contentContainerStyle={styles.flatListContent}
-          />
-        ) : (
-          <Text>Loading...</Text>
-        )}
+      
+      <FlatList 
+        data={filteredRockets}
+        renderItem={({ item }) => renderItem({ item })}
+        keyExtractor={(item) => item.name}
+        contentContainerStyle={styles.flatListContent}
+      />      
       </View>
-    
+
 
     <Modal visible={showModal} animationType='slide'>
     <ImageBackground source={require('../pictures/Pin-on-Animated-Images.gif')} style={styles.imageBackground}>
@@ -163,11 +162,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   flatListContainer : {
-    flexGrow : 1,
     flex : 1,
   },
   flatListContent  : {
-    paddingTop : 15
+    paddingTop : 10,
+    width: '100%'
   },
   leftContainer: {
     flexDirection: 'column',
