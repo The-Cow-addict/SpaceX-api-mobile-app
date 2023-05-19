@@ -69,7 +69,6 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onboardingComplete 
 
 export default function App() {
   const [dataQuery, setdataQuery] = useState(RocketQuery)
-  const [showPopup, setShowPopup] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(true);
 
   const handleOnboardingComplete = () => {
