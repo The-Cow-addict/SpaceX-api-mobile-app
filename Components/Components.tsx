@@ -1,9 +1,8 @@
-import { useQuery, DocumentNode} from '@apollo/client';
+import { useQuery, DocumentNode , gql} from '@apollo/client';
 import { Text, View, StyleSheet, Pressable, Modal, FlatList , Image, ImageBackground, SafeAreaView, ScrollView, Linking, TouchableOpacity, TextInput} from 'react-native';
-import React, {useState, useEffect, Dispatch, SetStateAction} from 'react'
+import React, {useState, useEffect} from 'react'
 import {Data} from './data';
-import DropDownPicker from 'react-native-dropdown-picker';
-
+import  AsyncStorage  from '@react-native-async-storage/async-storage';
 
 
 
@@ -11,12 +10,12 @@ type ComponentProps = {
   dataQuery : DocumentNode,
 }
 
-type FilterButtonProps = {
+interface FilterButtonProps {
   filter: string;
   label: string;
   selectedFilter: string;
-  onPress: Dispatch<SetStateAction<string>>;
-};
+  onPress: (filter: string) => void;
+}
 
 const Components : React.FC<ComponentProps> = ({dataQuery}) => {
   const { loading, error, data } = useQuery(dataQuery)
@@ -24,8 +23,11 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
   const [showModal, setshowModal] = useState(false)
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('Name');
-  const [isOpen, setIsOpen] = useState(false);
-  const [filteredRockets, setFilteredRockets] = useState<any[]>([]);
+  
+  const handleFilterSelect = (filter: string) => {
+    setSelectedFilter(filter);
+    setSearchQuery('');
+  };
 
   const handlePress = (rocket : any) => {
     setselectedRocket(rocket)
@@ -44,34 +46,19 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
     return <Text>Error: {error.message}</Text>
   }
 
-  const handleFilterValueSelect: Dispatch<SetStateAction<string>> = (value) => {
-    const stringValue = String(value);
-    setSelectedFilter(stringValue);
-    setIsOpen(false);
+  const filteredRockets = data?.rockets?.filter((rocket: any) => {
+    const rocketName = rocket.name.toLowerCase();
   
-    if (stringValue === 'Active: true') {
-      const filteredData = data?.rockets?.filter((rocket: any) => rocket.active === true);
-      setFilteredRockets(filteredData);
-    } else if (stringValue === 'Active: false') {
-      const filteredData = data?.rockets?.filter((rocket: any) => rocket.active === false);
-      setFilteredRockets(filteredData);
+    if (selectedFilter === 'Active: true') {
+      return rocket.active === true;
     }
-  };
-
-  const filteredData = searchQuery
-  ? data?.rockets?.filter((rocket: any) => {
-      if (selectedFilter === 'Name') {
-        return rocket.name.toLowerCase().includes(searchQuery.toLowerCase());
-      }
-      if (selectedFilter === 'Active: true') {
-        return rocket.active === true;
-      }
-      if (selectedFilter === 'Active: false') {
-        return rocket.active === false;
-      }
-      return true;
-    })
-  : data?.rockets;
+  
+    if (selectedFilter === 'Active: false') {
+      return rocket.active === false;
+    }
+    
+    return rocketName.includes(searchQuery.toLowerCase()) || selectedFilter === 'All';
+  });
 
   const renderItem = ({ item }: { item: any }) => {
     const dataItem = Data.find((dataItem) => dataItem.id === item.id);
@@ -90,6 +77,27 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
     )
   }
 
+  const FilterButton: React.FC<FilterButtonProps> = ({ filter, label, selectedFilter, onPress }) => {
+    return (
+      <TouchableOpacity
+        style={[
+          styles.filterButton,
+          filter === selectedFilter && styles.selectedFilterButton,
+        ]}
+        onPress={() => onPress(filter)}
+      >
+        <Text
+          style={[
+            styles.filterButtonText,
+            filter === selectedFilter && styles.selectedFilterButtonText,
+          ]}
+        >
+          {label}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <SafeAreaView>
       <View style={styles.container}>
@@ -100,31 +108,34 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
         value={searchQuery}
         onChangeText={text => setSearchQuery(text)}
       />
-
-      {/* <DropDownPicker
-        open={isOpen}
-        value={selectedFilter}
-        items={[
-          { label: 'Name', value: 'Name' },
-          { label: 'Active: true', value: 'Active: true' },
-          { label: 'Active: false', value: 'Active: false' },
-        ]}
-        setOpen={setIsOpen}
-        setValue={handleFilterValueSelect}
-        style={styles.filterDropdown}
-        dropDownContainerStyle={styles.filterDropdownContainer}
-        listItemLabelStyle={styles.filterDropdownItemLabel}
-        listItemContainerStyle={styles.filterDropdownItemContainer}
-        selectedItemLabelStyle={styles.filterDropdownSelectedItemLabel}
-      /> */}
       
       <FlatList 
-        data={filteredData}
+        data={filteredRockets}
         renderItem={({ item }) => renderItem({ item })}
         keyExtractor={(item) => item.name}
         contentContainerStyle={styles.flatListContent}
       />      
-      </View>
+      <FilterButton
+        filter="Name"
+        label="Name"
+        selectedFilter={selectedFilter}
+        onPress={handleFilterSelect}
+      />
+
+      <FilterButton
+        filter="Active: true"
+        label="Active: true"
+        selectedFilter={selectedFilter}
+        onPress={handleFilterSelect}
+      />
+
+      <FilterButton
+        filter="Active: false"
+        label="Active: false"
+        selectedFilter={selectedFilter}
+        onPress={handleFilterSelect}
+      />
+    </View>
 
 
     <Modal visible={showModal} animationType='slide'>
@@ -186,7 +197,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 2,
     borderWidth : 1,
-    borderColor : 'blue',
+    borderColor : 'blue'
   },
   cardText: {
     fontSize: 16,
@@ -270,23 +281,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     color : 'white'
    },
-   filterDropdown: {
-    backgroundColor: '#f2f2f2', // Set the background color to a lighter gray
-    zIndex: 1, // Ensure the dropdown appears above other elements
+   filterButton: {
+    backgroundColor: 'blue',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginTop: 10,
+    alignSelf: 'center',
   },
-  filterDropdownContainer: {
-    borderWidth: 0, // Remove border
+  selectedFilterButton: {
+    backgroundColor: 'red',
   },
-  filterDropdownItemLabel: {
-    color: '#333333', // Set the item label color
+  filterButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
-  filterDropdownItemContainer: {
-    backgroundColor: '#f2f2f2', // Set the item container background color
-    paddingVertical: 10, // Adjust the padding as needed
+  selectedFilterButtonText: {
+    color: 'black',
   },
-  filterDropdownSelectedItemLabel: {
-    color: '#333333', // Set the selected item label color
-  },
+
 });
 
 export default Components
