@@ -3,8 +3,6 @@ import { Text, View, StyleSheet, Pressable, Modal, FlatList , Image, ImageBackgr
 import React, {useState, useEffect} from 'react'
 import {Data} from './data';
 
-
-
 type ComponentProps = {
   dataQuery : DocumentNode,
 }
