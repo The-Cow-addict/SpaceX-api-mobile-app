@@ -2,7 +2,6 @@ import { useQuery, DocumentNode , gql} from '@apollo/client';
 import { Text, View, StyleSheet, Pressable, Modal, FlatList , Image, ImageBackground, SafeAreaView, ScrollView, Linking, TouchableOpacity, TextInput} from 'react-native';
 import React, {useState, useEffect} from 'react'
 import {Data} from './data';
-import  AsyncStorage  from '@react-native-async-storage/async-storage';
 
 
 
@@ -101,40 +100,44 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
   return (
     <SafeAreaView>
       <View style={styles.container}>
+      <View>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search rockets..."
+          value={searchQuery}
+          onChangeText={text => setSearchQuery(text)}
+        />
+      </View>
+
+      <View style={styles.filterButtonContainer}>
+        <FilterButton
+          filter="Name"
+          label="Name"
+          selectedFilter={selectedFilter}
+          onPress={handleFilterSelect}
+        />
+
+        <FilterButton
+          filter="Active: true"
+          label="Active: true"
+          selectedFilter={selectedFilter}
+          onPress={handleFilterSelect}
+        />
+
+        <FilterButton
+          filter="Active: false"
+          label="Active: false"
+          selectedFilter={selectedFilter}
+          onPress={handleFilterSelect}
+        />
+      </View>
       <View style={styles.flatListContainer}>
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search rockets..."
-        value={searchQuery}
-        onChangeText={text => setSearchQuery(text)}
-      />
-      
       <FlatList 
         data={filteredRockets}
         renderItem={({ item }) => renderItem({ item })}
         keyExtractor={(item) => item.name}
         contentContainerStyle={styles.flatListContent}
       />      
-      <FilterButton
-        filter="Name"
-        label="Name"
-        selectedFilter={selectedFilter}
-        onPress={handleFilterSelect}
-      />
-
-      <FilterButton
-        filter="Active: true"
-        label="Active: true"
-        selectedFilter={selectedFilter}
-        onPress={handleFilterSelect}
-      />
-
-      <FilterButton
-        filter="Active: false"
-        label="Active: false"
-        selectedFilter={selectedFilter}
-        onPress={handleFilterSelect}
-      />
     </View>
 
 
@@ -182,6 +185,12 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  filterButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   imageBackground: {
     flex: 1,
