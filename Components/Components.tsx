@@ -126,7 +126,7 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
 
     <View>
         <Button onPress={goToPreviousPage} title="Previous" disabled={currentPage === 1} />
-        <Text style={{fontWeight : 'bold', color : 'white'}}>{currentPage}</Text>
+        <Text style={{fontWeight : 'bold', color : 'white', textAlign : 'center'}}>{currentPage}</Text>
         <Button onPress={goToNextPage} title="Next" disabled={currentPage === totalPages} />
     </View>
 
