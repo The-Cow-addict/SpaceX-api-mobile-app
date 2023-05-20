@@ -11,7 +11,7 @@
   "dependencies": {
     "@apollo/client": "^3.7.14",
     "@react-native-async-storage/async-storage": "^1.17.11",
-    "@react-native-picker/picker": "2.4.8",
+    "@react-native-picker/picker": "^2.4.8",
     "axios": "^1.4.0",
     "expo": "~48.0.15",
     "expo-status-bar": "~1.4.4",
@@ -20,7 +20,8 @@
     "react-native-dropdown-picker": "^5.4.6",
     "react-native-elements": "^3.4.3",
     "react-native-modal": "^13.0.1",
-    "react-native-onboarding-swiper": "^1.2.0"
+    "react-native-onboarding-swiper": "^1.2.0",
+    "react-native-picker-select": "^8.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

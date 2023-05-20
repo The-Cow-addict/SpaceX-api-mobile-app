@@ -2,16 +2,11 @@ import { useQuery, DocumentNode , gql} from '@apollo/client';
 import { Text, View, StyleSheet, Pressable, Modal, FlatList , Image, ImageBackground, SafeAreaView, ScrollView, Linking, TouchableOpacity, TextInput} from 'react-native';
 import React, {useState, useEffect} from 'react'
 import {Data} from './data';
+import RNPickerSelect from 'react-native-picker-select';
+import FilterDropdown from './FilterDropdown';
 
 type ComponentProps = {
   dataQuery : DocumentNode,
-}
-
-interface FilterButtonProps {
-  filter: string;
-  label: string;
-  selectedFilter: string;
-  onPress: (filter: string) => void;
 }
 
 const Components : React.FC<ComponentProps> = ({dataQuery}) => {
@@ -20,11 +15,6 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
   const [showModal, setshowModal] = useState(false)
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('Name');
-  
-  const handleFilterSelect = (filter: string) => {
-    setSelectedFilter(filter);
-    setSearchQuery('');
-  };
 
   const handlePress = (rocket : any) => {
     setselectedRocket(rocket)
@@ -45,15 +35,15 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
 
   const filteredRockets = data?.rockets?.filter((rocket: any) => {
     const rocketName = rocket.name.toLowerCase();
-  
+
     if (selectedFilter === 'Active: true') {
       return rocket.active === true;
     }
-  
+
     if (selectedFilter === 'Active: false') {
       return rocket.active === false;
     }
-    
+
     return rocketName.includes(searchQuery.toLowerCase()) || selectedFilter === 'All';
   });
 
@@ -74,61 +64,16 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
     )
   }
 
-  const FilterButton: React.FC<FilterButtonProps> = ({ filter, label, selectedFilter, onPress }) => {
-    return (
-      <TouchableOpacity
-        style={[
-          styles.filterButton,
-          filter === selectedFilter && styles.selectedFilterButton,
-        ]}
-        onPress={() => onPress(filter)}
-      >
-        <Text
-          style={[
-            styles.filterButtonText,
-            filter === selectedFilter && styles.selectedFilterButtonText,
-          ]}
-        >
-          {label}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
-
   return (
     <SafeAreaView>
       <View style={styles.container}>
-      <View>
-        <TextInput
-          style={styles.searchBar}
-          placeholder="Search rockets..."
-          value={searchQuery}
-          onChangeText={text => setSearchQuery(text)}
-        />
-      </View>
+      <FilterDropdown 
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        selectedFilter={selectedFilter}
+        setSelectedFilter={setSelectedFilter}
+      />
 
-      <View style={styles.filterButtonContainer}>
-        <FilterButton
-          filter="Name"
-          label="Name"
-          selectedFilter={selectedFilter}
-          onPress={handleFilterSelect}
-        />
-
-        <FilterButton
-          filter="Active: true"
-          label="Active: true"
-          selectedFilter={selectedFilter}
-          onPress={handleFilterSelect}
-        />
-
-        <FilterButton
-          filter="Active: false"
-          label="Active: false"
-          selectedFilter={selectedFilter}
-          onPress={handleFilterSelect}
-        />
-      </View>
       <View style={styles.flatListContainer}>
       <FlatList 
         data={filteredRockets}
@@ -280,33 +225,6 @@ const styles = StyleSheet.create({
     color: 'white',
     textDecorationLine: 'underline',
   },
-  searchBar: {
-    height: 40,
-    backgroundColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 16,
-    paddingHorizontal: 10,
-    color : 'white'
-   },
-   filterButton: {
-    backgroundColor: 'blue',
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginTop: 10,
-    alignSelf: 'center',
-  },
-  selectedFilterButton: {
-    backgroundColor: 'red',
-  },
-  filterButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  selectedFilterButtonText: {
-    color: 'black',
-  },
-
 });
 
 export default Components
