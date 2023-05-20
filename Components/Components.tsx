@@ -23,17 +23,8 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageData, setPageData] = useState<Rocket[]>([]);
-  const [filteredRockets, setFilteredRockets] = useState<Rocket[]>([]);
 
-  const itemsPerPage = 4;
-
-  const paginateData = (pageNumber : any, rockets : Rocket[]) => {
-    const startIndex = (pageNumber - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const subset = rockets.slice(startIndex, endIndex);
-
-    setPageData(subset);
-  };
+  const itemsPerPage = 2;
 
   useEffect(() => {
     const filteredRockets = data?.rockets?.filter((rocket: any) => {
