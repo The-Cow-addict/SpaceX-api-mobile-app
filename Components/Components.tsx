@@ -1,5 +1,5 @@
 import { useQuery, DocumentNode , gql} from '@apollo/client';
-import { Text, View, StyleSheet, Pressable, Modal, FlatList , Image, ImageBackground, SafeAreaView, ScrollView, Linking, TouchableOpacity, TextInput} from 'react-native';
+import { Text, View, StyleSheet, Pressable, Modal, FlatList , Image, ImageBackground, SafeAreaView, ScrollView, Linking, TouchableOpacity, Button} from 'react-native';
 import React, {useState, useEffect} from 'react'
 import {Data} from './data';
 import RNPickerSelect from 'react-native-picker-select';
@@ -9,17 +9,78 @@ type ComponentProps = {
   dataQuery : DocumentNode,
 }
 
+type Rocket = {
+  id : string,
+  name : string
+}
+
 const Components : React.FC<ComponentProps> = ({dataQuery}) => {
-  const { loading, error, data } = useQuery(dataQuery)
-  const [selectedRocket, setselectedRocket] = useState<any>(null)
-  const [showModal, setshowModal] = useState(false)
+  const { loading, error, data } = useQuery(dataQuery);
+  const [selectedRocket, setselectedRocket] = useState<any>(null);
+  const [showModal, setshowModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('Name');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pageData, setPageData] = useState<Rocket[]>([]);
+  const [filteredRockets, setFilteredRockets] = useState<Rocket[]>([]);
+
+  const itemsPerPage = 4;
+
+  const paginateData = (pageNumber : any, rockets : Rocket[]) => {
+    const startIndex = (pageNumber - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const subset = rockets.slice(startIndex, endIndex);
+
+    setPageData(subset);
+  };
+
+  useEffect(() => {
+    const filteredRockets = data?.rockets?.filter((rocket: any) => {
+      const rocketName = rocket.name.toLowerCase();
+
+      if (selectedFilter === 'Active: true') {
+        return rocket.active === true;
+      }
+
+      if (selectedFilter === 'Active: false') {
+        return rocket.active === false;
+      }
+
+      return (
+        rocketName.includes(searchQuery.toLowerCase()) ||
+        selectedFilter === 'All'
+      );
+    });
+
+    const totalItems = filteredRockets?.length || 0;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    setTotalPages(totalPages);
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const subset = filteredRockets?.slice(startIndex, endIndex) || [];
+    setPageData(subset);
+  }, [data, searchQuery, selectedFilter, currentPage]);
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      const previousPage = currentPage - 1;
+      setCurrentPage(previousPage);
+    }
+  };
 
   const handlePress = (rocket : any) => {
     setselectedRocket(rocket)
     setshowModal(true)
-  }
+  };
 
   const handleWikipediaPress = () => {
     Linking.openURL(selectedRocket.wikipedia);
@@ -27,25 +88,11 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
 
   if (loading) {
     return <Text style={{fontWeight : 'bold', color : 'white'}}>Loading...</Text>
-  }
+  };
 
   if (error) {
     return <Text>Error: {error.message}</Text>
-  }
-
-  const filteredRockets = data?.rockets?.filter((rocket: any) => {
-    const rocketName = rocket.name.toLowerCase();
-
-    if (selectedFilter === 'Active: true') {
-      return rocket.active === true;
-    }
-
-    if (selectedFilter === 'Active: false') {
-      return rocket.active === false;
-    }
-
-    return rocketName.includes(searchQuery.toLowerCase()) || selectedFilter === 'All';
-  });
+  };
 
   const renderItem = ({ item }: { item: any }) => {
     const dataItem = Data.find((dataItem) => dataItem.id === item.id);
@@ -75,16 +122,22 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
           setSelectedFilter={setSelectedFilter}
         />
         </View>
+        
 
       <View style={styles.flatListContainer}>
       <FlatList 
-        data={filteredRockets}
+        data={pageData}
         renderItem={({ item }) => renderItem({ item })}
         keyExtractor={(item) => item.name}
         contentContainerStyle={styles.flatListContent}
       />      
     </View>
 
+    <View>
+        <Button onPress={goToPreviousPage} title="Previous" disabled={currentPage === 1} />
+        <Text style={{fontWeight : 'bold', color : 'white'}}>{currentPage}</Text>
+        <Button onPress={goToNextPage} title="Next" disabled={currentPage === totalPages} />
+    </View>
 
     <Modal visible={showModal} animationType='slide'>
     <ImageBackground source={require('../pictures/Pin-on-Animated-Images.gif')} style={styles.imageBackground}>
