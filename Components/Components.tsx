@@ -67,12 +67,14 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
   return (
     <SafeAreaView>
       <View style={styles.container}>
-      <FilterDropdown 
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        selectedFilter={selectedFilter}
-        setSelectedFilter={setSelectedFilter}
-      />
+        <View style={styles.filterDropdown}>
+        <FilterDropdown 
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedFilter={selectedFilter}
+          setSelectedFilter={setSelectedFilter}
+        />
+        </View>
 
       <View style={styles.flatListContainer}>
       <FlatList 
@@ -129,12 +131,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  filterButtonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
   imageBackground: {
     flex: 1,
     resizeMode: 'cover',
@@ -149,7 +145,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 2,
     borderWidth : 1,
-    borderColor : 'blue'
+    borderColor : 'blue',
   },
   cardText: {
     fontSize: 16,
@@ -171,14 +167,17 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     fontSize: 18,
-    color: 'blue',
+    color: 'white',
     marginTop: 20,
+    paddingVertical : 10,
+    paddingHorizontal : 20,
+    backgroundColor : 'blue',
+    borderRadius : 10,
   },
   flatListContainer : {
     flex : 1,
   },
   flatListContent  : {
-    paddingTop : 10,
     width: '100%'
   },
   leftContainer: {
@@ -216,6 +215,7 @@ const styles = StyleSheet.create({
     color : 'white',
     fontWeight : 'bold',
     textAlign : 'justify',
+    fontSize : 16,
   },
   modalContent: {
     flexGrow: 1,
@@ -225,6 +225,9 @@ const styles = StyleSheet.create({
     color: 'white',
     textDecorationLine: 'underline',
   },
+  filterDropdown : {
+    paddingBottom : 20,
+  }
 });
 
 export default Components

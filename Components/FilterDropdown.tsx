@@ -64,7 +64,6 @@ type FilterDropdownProps = {
       borderColor: 'gray',
       backgroundColor : 'gray',
       borderRadius: 4,
-      marginBottom: 10,
     },
   });
   
