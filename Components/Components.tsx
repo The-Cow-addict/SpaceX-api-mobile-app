@@ -1,4 +1,4 @@
-import { useQuery, DocumentNode , gql} from '@apollo/client';
+import { useQuery, DocumentNode , ApolloClient, InMemoryCache, gql} from '@apollo/client';
 import { Text, View, StyleSheet, Pressable, Modal, FlatList , Image, ImageBackground, SafeAreaView, ScrollView, Linking, TouchableOpacity, Button} from 'react-native';
 import React, {useState, useEffect} from 'react'
 import {Data} from './data';
@@ -26,28 +26,47 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
 
   const itemsPerPage = 2;
 
-  useEffect(() => {
+  const client = new ApolloClient({
+    uri: 'https://main--spacex-l4uc6p.apollographos.net/graphql',
+    cache: new InMemoryCache(),
+  });
+
+  const fetchData = async (page: number, limit: number) => {
+    const { data } = await client.query({
+      query: dataQuery,
+      variables: {
+        page,
+        limit,
+      },
+    });
+
+    return data;
+  };
+
+  const fetchPageData = async (page: number) => {
+    const data = await fetchData(page, itemsPerPage);
+
     const filteredRockets = data?.rockets?.filter((rocket: any) => {
       const rocketName = rocket.name.toLowerCase();
-  
+
       if (selectedFilter === 'Active: true') {
         return rocket.active === true;
       }
-  
+
       if (selectedFilter === 'Active: false') {
         return rocket.active === false;
       }
-  
+
       return (
         rocketName.includes(searchQuery.toLowerCase()) ||
         selectedFilter === 'All'
       );
     });
-  
+
     const totalItems = filteredRockets?.length || 0;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     setTotalPages(totalPages);
-  
+
     if (filteredRockets && filteredRockets.length > 0) {
       const startIndex = (currentPage - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
@@ -56,19 +75,25 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
     } else {
       setPageData(data?.rockets || []);
     }
-  }, [data, searchQuery, selectedFilter, currentPage]);
+  };
+
+  useEffect(() => {
+    fetchPageData(currentPage);
+  }, [searchQuery, selectedFilter, currentPage]);
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {
       const nextPage = currentPage + 1;
       setCurrentPage(nextPage);
+      fetchPageData(nextPage); 
     }
   };
-
+  
   const goToPreviousPage = () => {
     if (currentPage > 1) {
       const previousPage = currentPage - 1;
       setCurrentPage(previousPage);
+      fetchPageData(previousPage); 
     }
   };
 
