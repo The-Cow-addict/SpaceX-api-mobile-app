@@ -124,11 +124,40 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
       />      
     </View>
 
-    <View>
-        <Button onPress={goToPreviousPage} title="Previous" disabled={currentPage === 1} />
-        <Text style={{fontWeight : 'bold', color : 'white', textAlign : 'center'}}>{currentPage}</Text>
-        <Button onPress={goToNextPage} title="Next" disabled={currentPage === totalPages} />
+    <View style={styles.pagination}>
+    <TouchableOpacity
+      onPress={goToPreviousPage}
+      style={[
+        styles.buttonContainer,
+        currentPage === 1 ? { backgroundColor: 'gray' } : { backgroundColor: 'blue' }
+      ]}
+      disabled={currentPage === 1}
+    >
+      <View style={styles.buttonInnerContainer}>
+        <Text style={styles.buttonText}>Previous</Text>
+      </View> 
+    </TouchableOpacity>
+
+    <View style={{ justifyContent: 'center' }}>
+      <Text style={{ fontWeight: 'bold', color: 'white', textAlign: 'center' }}>
+        {currentPage}
+      </Text>
     </View>
+
+    <TouchableOpacity
+      onPress={goToNextPage}
+      style={[
+        styles.buttonContainer,
+        currentPage === totalPages ? { backgroundColor: 'gray' } : { backgroundColor: 'blue' }
+      ]}
+      disabled={currentPage === totalPages}
+    >
+      <View style={styles.buttonInnerContainer}>
+        <Text style={styles.buttonText}>Next</Text>
+      </View>
+    </TouchableOpacity>
+  </View>
+
 
     <Modal visible={showModal} animationType='slide'>
     <ImageBackground source={require('../pictures/Pin-on-Animated-Images.gif')} style={styles.imageBackground}>
@@ -271,7 +300,38 @@ const styles = StyleSheet.create({
   },
   filterDropdown : {
     paddingBottom : 20,
-  }
+  },
+  pagination: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 10,
+  },
+  buttonContainer: {
+    flex: 1,
+    height: 40,
+    marginHorizontal: '5%',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonInnerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  pageContainer: {
+    justifyContent: 'center',
+  },
+  pageText: {
+    fontWeight: 'bold',
+    color: 'white',
+    textAlign: 'center',
+  },
 });
 
 export default Components
