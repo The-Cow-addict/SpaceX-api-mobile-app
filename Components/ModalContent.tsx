@@ -20,7 +20,6 @@ const ModalContent: React.FC<ModalContentProps> = ({
         <Text style={styles.modalText}>Country: {selectedRocket.country}</Text>
         <Text style={styles.modalText}>Company: {selectedRocket.company}</Text>
         <Text style={styles.modalText}>Mass (kg): {selectedRocket.mass.kg}</Text>
-        <Text style={styles.modalText}>Info: {selectedRocket.description}</Text>
         <Text style={styles.modalText}>Cost per launch: ${selectedRocket.cost_per_launch.toString()}</Text>
         <Text style={styles.modalText}>Engine loss max: {selectedRocket.engines.engine_loss_max}</Text>
         <Text style={styles.modalText}>Engine Layout: {selectedRocket.engines.layout}</Text>
@@ -28,6 +27,7 @@ const ModalContent: React.FC<ModalContentProps> = ({
         <Text style={styles.modalText}>Number of thrusters: {selectedRocket.engines.number}</Text>
         <Text style={styles.modalText}>Propellant 1: {selectedRocket.engines.propellant_1}</Text>
         <Text style={styles.modalText}>Propellant 2: {selectedRocket.engines.propellant_2}</Text>
+        <Text style={styles.modalText}>Info: {selectedRocket.description}</Text>
         <Text style={styles.modalText}>
           Wikipedia:{' '}
           <TouchableOpacity onPress={handleWikipediaPress}>
