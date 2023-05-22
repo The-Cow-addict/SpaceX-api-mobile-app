@@ -1,9 +1,10 @@
 import { useQuery, DocumentNode , ApolloClient, InMemoryCache, gql} from '@apollo/client';
-import { Text, View, StyleSheet, Pressable, Modal, FlatList , Image, ImageBackground, SafeAreaView, ScrollView, Linking, TouchableOpacity, Button} from 'react-native';
+import { Text, View, StyleSheet, Pressable, Modal, FlatList , Image, ImageBackground, SafeAreaView, ScrollView, Linking, TouchableOpacity} from 'react-native';
 import React, {useState, useEffect} from 'react'
 import {Data} from './data';
-import RNPickerSelect from 'react-native-picker-select';
 import FilterDropdown from './FilterDropdown';
+import ModalContent from './ModalContent';
+ 
 
 type ComponentProps = {
   dataQuery : DocumentNode,
@@ -187,42 +188,21 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
   </View>
 
 
-    <Modal visible={showModal} animationType='slide'>
-    <ImageBackground source={require('../pictures/Pin-on-Animated-Images.gif')} style={styles.imageBackground}>
-     <View style={styles.modalWrapper}>
-      <View style={styles.modalContainer}>
-        {selectedRocket && (
-          <>
-          <ScrollView contentContainerStyle={styles.modalContent}>
-            <Text style={styles.modalText}>Name: {selectedRocket.name}</Text>
-            <Text style={styles.modalText}>Active: {selectedRocket.active.toString()}</Text>
-            <Text style={styles.modalText}>Country: {selectedRocket.country}</Text>
-            <Text style={styles.modalText}>Company: {selectedRocket.company}</Text>
-            <Text style={styles.modalText}>Mass (kg): {selectedRocket.mass.kg}</Text>
-            <Text style={styles.modalText}>Info : {selectedRocket.description}</Text>
-            <Text style={styles.modalText}>Cost per lauch : ${selectedRocket.cost_per_launch.toString()}</Text>
-            <Text style={styles.modalText}>Engine loss max : {selectedRocket.engines.engine_loss_max}</Text>
-            <Text style={styles.modalText}>Engine Layout : {selectedRocket.engines.layout}</Text>
-            <Text style={styles.modalText}>Engine thrust : {selectedRocket.engines.thrust_to_weight}</Text>
-            <Text style={styles.modalText}>Number of thrusters : {selectedRocket.engines.number}</Text>
-            <Text style={styles.modalText}>Propellant 1 : {selectedRocket.engines.propellant_1}</Text>
-            <Text style={styles.modalText}>Propellant 2 : {selectedRocket.engines.propellant_2}</Text>
-            <Text style={styles.modalText}>
-              Wikipedia :{' '}
-              <TouchableOpacity onPress={handleWikipediaPress}>
-                <Text style={styles.linkText}>{selectedRocket.wikipedia}</Text>
-              </TouchableOpacity>
-            </Text>
-          </ScrollView>
-        </>
-        )}
-            <Pressable onPress={() => setshowModal(false)}>
-              <Text style={styles.closeButton}>Close</Text>
-            </Pressable>
+  <Modal visible={showModal} animationType="slide">
+        <ImageBackground source={require('../pictures/Pin-on-Animated-Images.gif')} style={styles.imageBackground}>
+          <View style={styles.modalWrapper}>
+            <View style={styles.modalContainer}>
+              {selectedRocket && (
+                <ModalContent
+                  selectedRocket={selectedRocket}
+                  handleWikipediaPress={handleWikipediaPress}
+                  closeModal={() => setshowModal(false)}
+                />
+              )}
+            </View>
           </View>
-     </View>
-     </ImageBackground>
-    </Modal>
+        </ImageBackground>
+      </Modal>
     </View>
     </SafeAreaView>
   )
@@ -266,15 +246,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0)',
     color : 'white'
   },
-  closeButton: {
-    fontSize: 18,
-    color: 'white',
-    marginTop: 20,
-    paddingVertical : 10,
-    paddingHorizontal : 20,
-    backgroundColor : 'blue',
-    borderRadius : 10,
-  },
   flatListContainer : {
     flex : 1,
   },
@@ -311,16 +282,6 @@ const styles = StyleSheet.create({
     borderBottomWidth : 1,
     marginBottom : 5,
     marginTop : 5,
-  },
-  modalText : {
-    color : 'white',
-    fontWeight : 'bold',
-    textAlign : 'justify',
-    fontSize : 16,
-  },
-  modalContent: {
-    flexGrow: 1,
-    justifyContent: 'space-evenly',
   },
   linkText: {
     color: 'white',
