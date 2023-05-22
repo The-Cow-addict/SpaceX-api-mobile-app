@@ -45,34 +45,34 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
 
   const fetchPageData = async (page: number) => {
     const data = await fetchData(page, itemsPerPage);
-
+  
     const filteredRockets = data?.rockets?.filter((rocket: any) => {
       const rocketName = rocket.name.toLowerCase();
-
+  
       if (selectedFilter === 'Active: true') {
         return rocket.active === true;
       }
-
+  
       if (selectedFilter === 'Active: false') {
         return rocket.active === false;
       }
-
+  
       return (
         rocketName.includes(searchQuery.toLowerCase()) ||
         selectedFilter === 'All'
       );
     });
-
+  
     const totalItems = filteredRockets?.length || 0;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     setTotalPages(totalPages);
-
+  
     if (filteredRockets && filteredRockets.length > 0) {
       const startIndex = (currentPage - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
       const subset = filteredRockets?.slice(startIndex, endIndex) || [];
       setPageData(subset);
-    } else {
+    } else if (searchQuery.trim().length === 0) {
       setPageData(data?.rockets || []);
     }
     setCurrentPage(page);

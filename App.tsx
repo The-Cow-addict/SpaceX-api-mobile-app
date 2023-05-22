@@ -2,8 +2,6 @@ import { ImageBackground, StatusBar, StyleSheet, Text, View, TouchableOpacity } 
 import { ApolloClient, InMemoryCache, ApolloProvider,useQuery, gql } from '@apollo/client';
 import Components from './Components/Components'
 import { useState , useEffect} from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 
 const client = new ApolloClient({
   uri: 'https://main--spacex-l4uc6p.apollographos.net/graphql', 
@@ -57,14 +55,17 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onboardingComplete 
   };
 
   return (
+    <ImageBackground source={require('./pictures/Pin-on-Animated-Images.gif')} style={styles.imageBackground}>
     <View>
-      <Text>Welcome to the App!</Text>
-      <TouchableOpacity onPress={handleOnboardingComplete}>
-        <Text>Continue</Text>
-      </TouchableOpacity>
+      <StatusBar barStyle={'light-content'} />
+        <Text style={styles.title}>Welcome to the App!</Text>
+        <TouchableOpacity style={styles.button} onPress={handleOnboardingComplete}>
+          <Text style={styles.buttonText}>Continue</Text>
+        </TouchableOpacity>
     </View>
+    </ImageBackground>
   );
-};
+}
 
 
 export default function App() {
@@ -110,8 +111,10 @@ const styles = StyleSheet.create({
   imageBackground: {
     flex: 1,
     resizeMode: 'cover',
-    width : '100%',
-    height : '100%'
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   popupBackground: {
     flex: 1,
@@ -131,5 +134,23 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     color: 'blue',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 20,
+  },
+  button: {
+    backgroundColor: 'blue',
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 20,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign : 'center',
   },
 });
