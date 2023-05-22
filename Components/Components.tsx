@@ -14,6 +14,11 @@ type Rocket = {
   name : string
 }
 
+const client = new ApolloClient({
+    uri: 'https://main--spacex-l4uc6p.apollographos.net/graphql',
+    cache: new InMemoryCache(),
+  });
+
 const Components : React.FC<ComponentProps> = ({dataQuery}) => {
   const { loading, error, data } = useQuery(dataQuery);
   const [selectedRocket, setselectedRocket] = useState<any>(null);
@@ -26,20 +31,15 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
 
   const itemsPerPage = 2;
 
-  const client = new ApolloClient({
-    uri: 'https://main--spacex-l4uc6p.apollographos.net/graphql',
-    cache: new InMemoryCache(),
-  });
-
   const fetchData = async (page: number, limit: number) => {
     const { data } = await client.query({
       query: dataQuery,
       variables: {
-        page,
+        offset: (page - 1) * limit,
         limit,
       },
     });
-
+  
     return data;
   };
 
@@ -75,6 +75,7 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
     } else {
       setPageData(data?.rockets || []);
     }
+    setCurrentPage(page);
   };
 
   useEffect(() => {
@@ -84,16 +85,14 @@ const Components : React.FC<ComponentProps> = ({dataQuery}) => {
   const goToNextPage = () => {
     if (currentPage < totalPages) {
       const nextPage = currentPage + 1;
-      setCurrentPage(nextPage);
-      fetchPageData(nextPage); 
+      fetchPageData(nextPage);
     }
   };
   
   const goToPreviousPage = () => {
     if (currentPage > 1) {
       const previousPage = currentPage - 1;
-      setCurrentPage(previousPage);
-      fetchPageData(previousPage); 
+      fetchPageData(previousPage);
     }
   };
 
